@@ -6,9 +6,9 @@
     <Product>Apollo.EET</Product>
     <Authors>Apollo IT Data</Authors>
     <Description>Client for EET 2.0 - Czech fiscal machines (Apollo fork).</Description>
-    <RepositoryUrl>https://github.com/Apollo-IT-Data/fiscalization-czechia</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Apollo-IT-Data/Apollo.EET</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/Apollo-IT-Data/fiscalization-czechia</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Apollo-IT-Data/Apollo.EET</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>EET Fiscal Receipt</PackageTags>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
