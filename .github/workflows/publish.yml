@@ -1,4 +1,4 @@
-name: Publish Apollo.Mews.Eet
+name: Publish Apollo.EET
 
 on:
   push:
