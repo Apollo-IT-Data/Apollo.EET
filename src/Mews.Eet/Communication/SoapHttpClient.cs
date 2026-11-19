@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Mews.Eet.Events;
 
@@ -26,7 +27,7 @@ namespace Mews.Eet.Communication
 
         private EetLogger Logger { get; }
 
-        public async Task<string> SendAsync(string body)
+        public async Task<string> SendAsync(string body, CancellationToken ct = default)
         {
             var requestContent = new StringContent(body, Encoding.UTF8, "application/x-www-form-urlencoded");
             Logger?.Debug("Starting HTTP request.", new { HttpRequestBody = body });
@@ -34,7 +35,7 @@ namespace Mews.Eet.Communication
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            using (var response = await HttpClient.PostAsync(EndpointUri, requestContent).ConfigureAwait(continueOnCapturedContext: false))
+            using (var response = await HttpClient.PostAsync(EndpointUri, requestContent, ct).ConfigureAwait(continueOnCapturedContext: false))
             {
                 var result = await response.Content.ReadAsStringAsync().ConfigureAwait(continueOnCapturedContext: false);
 

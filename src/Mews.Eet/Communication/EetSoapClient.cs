@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using Mews.Eet.Dto;
 using Mews.Eet.Dto.Wsdl;
@@ -35,9 +36,9 @@ namespace Mews.Eet.Communication
 
         private EetLogger Logger { get; }
 
-        public async Task<SendRevenueXmlResponse> SendRevenueAsync(SendRevenueXmlMessage message)
+        public async Task<SendRevenueXmlResponse> SendRevenueAsync(SendRevenueXmlMessage message, CancellationToken ct = default)
         {
-            return await SoapClient.SendAsync<SendRevenueXmlMessage, SendRevenueXmlResponse>(message).ConfigureAwait(continueOnCapturedContext: false);
+            return await SoapClient.SendAsync<SendRevenueXmlMessage, SendRevenueXmlResponse>(message, ct).ConfigureAwait(continueOnCapturedContext: false);
         }
     }
 }

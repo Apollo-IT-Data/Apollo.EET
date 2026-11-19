@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Mews.Eet.Communication;
 using Mews.Eet.Dto;
@@ -25,14 +26,14 @@ namespace Mews.Eet
 
         private EetLogger Logger { get; }
 
-        public async Task<SendRevenueResult> SendRevenueAsync(RevenueRecord record, EetMode mode = EetMode.Operational)
+        public async Task<SendRevenueResult> SendRevenueAsync(RevenueRecord record, EetMode mode = EetMode.Operational, CancellationToken ct = default)
         {
             Logger?.Info($"Sending revenue record for bill '{record.BillNumber}' to EET servers in {mode} mode.", new { RecordIdentifier = record.Identifier });
 
             var xmlMessage = new SendRevenueMessage(record, mode).GetXmlMessage();
             Logger?.Debug("DTOs for XML mapping were created.", xmlMessage);
 
-            var sendRevenueResult = await EetSoapClient.SendRevenueAsync(xmlMessage).ConfigureAwait(continueOnCapturedContext: false);
+            var sendRevenueResult = await EetSoapClient.SendRevenueAsync(xmlMessage, ct).ConfigureAwait(continueOnCapturedContext: false);
             Logger?.Debug("Result received and successfully deserialized from XML DTOs.", sendRevenueResult);
 
             var result = new SendRevenueResult(sendRevenueResult);
