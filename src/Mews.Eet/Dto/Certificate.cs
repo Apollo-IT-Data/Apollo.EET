@@ -4,15 +4,24 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace Mews.Eet.Dto
 {
-    public class Certificate
+    public class Certificate : IDisposable
     {
         public Certificate(string password, byte[] data, bool useMachineKeyStore = false)
         {
             Password = password;
             KeyStorageFlags = GetKeyStorageFlags(useMachineKeyStore);
             Data = data;
-            Key = ComputeKey();
             X509Certificate2 = new X509Certificate2(Data, Password, KeyStorageFlags);
+            try
+            {
+                Key = X509Certificate2.GetRSAPrivateKey()
+                    ?? throw new ArgumentException("The provided certificate does not have any RSA private keys.");
+            }
+            catch
+            {
+                X509Certificate2.Dispose();
+                throw;
+            }
             UseMachineKeyStore = useMachineKeyStore;
         }
 
@@ -22,7 +31,7 @@ namespace Mews.Eet.Dto
 
         public bool UseMachineKeyStore { get; }
 
-        public RSACryptoServiceProvider Key { get; }
+        public RSA Key { get; }
 
         public X509Certificate2 X509Certificate2 { get; }
 
@@ -38,30 +47,10 @@ namespace Mews.Eet.Dto
             return X509KeyStorageFlags.Exportable;
         }
 
-        private RSACryptoServiceProvider ComputeKey()
+        public void Dispose()
         {
-            var certificateCollection = new X509Certificate2Collection();
-            certificateCollection.Import(Data, Password, KeyStorageFlags);
-            foreach (var certificate in certificateCollection)
-            {
-                if (!certificate.HasPrivateKey)
-                {
-                    continue;
-                }
-
-                var key = certificate.GetRSAPrivateKey();
-                var exportParameters = key.ExportParameters(includePrivateParameters: true);
-                var cspParameters = new CspParameters
-                {
-                    ProviderName = "Microsoft Enhanced RSA and AES Cryptographic Provider",
-                    Flags = UseMachineKeyStore ? CspProviderFlags.UseMachineKeyStore : CspProviderFlags.NoFlags
-                };
-                var result = new RSACryptoServiceProvider(cspParameters);
-                result.ImportParameters(exportParameters);
-                return result;
-            }
-
-            throw new ArgumentException("The provided certificate does not have any private keys.");
+            Key.Dispose();
+            X509Certificate2.Dispose();
         }
     }
 }
